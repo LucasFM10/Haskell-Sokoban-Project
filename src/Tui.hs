@@ -20,7 +20,7 @@ data TuiState =
   TuiState
   deriving (Show, Eq)
 
-data ResourceName =
+data ResourceName = 
   ResourceName
   deriving (Show, Eq, Ord)
 
