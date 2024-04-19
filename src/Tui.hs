@@ -40,7 +40,7 @@ tuiApp =
     appChooseCursor = neverShowCursor,
     appHandleEvent = handleTuiEvent,
     appStartEvent = return,
-    appAttrMap = const $ attrMap defAttr [("grass", bg green), ("player", bg blue)]
+    appAttrMap = const $ attrMap defAttr [("grass", bg ), ("player", bg blue)]
   }
 
 -- Função para construir o estado inicial do jogo.
