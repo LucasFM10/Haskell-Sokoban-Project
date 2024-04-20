@@ -3,7 +3,6 @@
 module Tui where
 
 import GameLogic
-import System.Directory
 import Brick.AttrMap
 import Brick.Main
 import Brick.Types
