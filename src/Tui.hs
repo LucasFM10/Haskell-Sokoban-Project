@@ -40,7 +40,7 @@ drawTui (TuiState _ (Player (px, py)) walls) =
     where
         rows = [ hBox $ [cell x y | x <- [0..8]] | y <- [0..8] ]
         cell x y
-            | (x, y) == (px, py) = withAttr "player" $ str "  "
+            | (x, y) == (px, py) = withAttr "player" $ str "😀"
             | (x, y) `elem` walls = withAttr "wall" $ str "[]"
             | otherwise = withAttr "grass" $ str "  "
 
