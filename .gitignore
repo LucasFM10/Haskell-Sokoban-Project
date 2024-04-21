@@ -1,0 +1,3 @@
+# Ignorar arquivos de interface de objeto e de sistema de interface do Haskell
+*.hi
+*.o
