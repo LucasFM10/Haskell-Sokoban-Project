@@ -42,7 +42,7 @@ tileToChar Box = '🍉'
 tileToChar Goal = '⭐'
 tileToChar Player = '😎'
 tileToChar PlayerOnGoal = '🤩'
-tileToChar BoxOnGoal = '🌟'
+tileToChar BoxOnGoal = '🌠'
 
 -- Mostra o menu inicial e solicita ao usuário para escolher um nível
 showMenu :: String -> [Board] -> IO ()
