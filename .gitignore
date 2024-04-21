@@ -2,5 +2,5 @@
 *.hi
 *.o
 
-# # Ignorar os binários/executáveis, caso eles sejam compilados diretamente
-# main
+# Ignorar os binários/executáveis, caso eles sejam compilados diretamente
+main
