@@ -31,6 +31,7 @@ printBoard :: Board -> IO ()
 printBoard board = do
     clearScreen
     mapM_ (putStrLn . map tileToChar) board
+    putStrLn "\nUtilize wasd para mover nosso herói estiloso!\n"
 
 -- Função auxiliar para converter um Tile para um caractere
 tileToChar :: Tile -> Char
@@ -55,15 +56,20 @@ showMenu :: String -> [Board] -> IO ()
 showMenu message boards = do
     putStrLn message
     input <- getLine
-    let parsedInput = reads input :: [(Int, String)]
-    case parsedInput of
-        [(level, "")] ->
-            if level >= 1 && level <= length boards then do
-                setupTerminal InGame
-                let selectedBoard = boards !! (level - 1)
-                gameLoop boards selectedBoard  -- Passa o tabuleiro escolhido e a lista completa de tabuleiros
-            else showMenu ("Número inválido, por favor digite um número entre 1 e " ++ show (length boards)) boards
-        _ -> showMenu "Por favor, insira um número válido." boards
+    if input == "quit" then do
+        putStrLn "Encerrando o jogo. Até mais!"
+        return ()  -- Encerra o programa
+    else
+        let parsedInput = reads input :: [(Int, String)]
+        in case parsedInput of
+            [(level, "")] ->
+                if level >= 1 && level <= length boards then do
+                    setupTerminal InGame
+                    let selectedBoard = boards !! (level - 1)
+                    gameLoop boards selectedBoard  -- Passa o tabuleiro escolhido e a lista completa de tabuleiros
+                else showMenu ("Nível inválido, por favor digite um número entre 1 e " ++ (show (length boards)) ++ ".\nOu 'quit' para encerrar o programa.") boards
+            _ -> showMenu "Por favor, insira um número!" boards
+
 
 -- Game loop que processa o jogo para um tabuleiro específico
 gameLoop :: [Board] -> Board -> IO ()
@@ -72,7 +78,9 @@ gameLoop boards currentBoard = do
     if isLevelWon currentBoard then do
         putStrLn "Você venceu! Aperte qualquer tecla para retornar ao menu."
         _ <- getChar
-        showMenu "Bem vindo de volta! Qual nível você deseja enfrentar agora?" boards
+        setupTerminal Menu
+        clearScreen
+        showMenu ("Bem vindo de volta! Qual nível você deseja enfrentar agora?\nDigite um número entre 1 e " ++ (show (length boards)) ++ ".\nOu 'quit' para encerrar o programa.") boards
     else do
         command <- getChar
         let newBoard = case command of
@@ -84,6 +92,9 @@ gameLoop boards currentBoard = do
         if command `elem` ['w', 's', 'a', 'd']
             then gameLoop boards newBoard
             else case command of
-                'm' -> showMenu "Bem vindo de volta! Qual nível você deseja enfrentar agora?" boards
+                'm' -> do
+                    setupTerminal Menu
+                    clearScreen
+                    showMenu ("Bem vindo de volta! Qual nível você deseja enfrentar agora?\ndigitando um número entre 1 e " ++ (show (length boards)) ++ ".\nOu 'quit' para encerrar o programa.") boards
                 'q' -> return ()
                 _   -> gameLoop boards currentBoard
