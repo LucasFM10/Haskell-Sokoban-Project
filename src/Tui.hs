@@ -15,7 +15,8 @@ import Graphics.Vty.Attributes
 data TuiState = TuiState {
     boardSize :: Pos,
     player :: Player,
-    walls :: Wall
+    walls :: Wall,
+    boxes :: Box -- Adicionar o estado das caixas
 } deriving (Show, Eq)
 
 -- Aplicação principal da TUI
@@ -26,34 +27,42 @@ tuiApp =
         appChooseCursor = neverShowCursor,
         appHandleEvent = handleTuiEvent,
         appStartEvent = return,
-        appAttrMap = const $ attrMap defAttr [("grass", bg black), ("player", bg blue), ("wall", bg white)]
+        appAttrMap = const $ attrMap defAttr [("grass", bg black), ("player", bg blue), ("wall", bg white), ("box", bg yellow)]
     }
-
+    
 -- Função para construir o estado inicial do jogo
 buildInitialState :: IO TuiState
-buildInitialState = pure $ TuiState (9,9) (Player (4,4)) [(1,1), (1,2), (2,1)]
+buildInitialState = pure $ TuiState (9,9) (Player (4,4)) [(1,1), (1,2), (2,1)] [(3,3)] -- Exemplo: Uma caixa na posição (3,3)
 
 -- Função para desenhar a interface do usuário
 drawTui :: TuiState -> [Widget ()]
-drawTui (TuiState _ (Player (px, py)) walls) =
-    [ vBox rows ]
-    where
-        rows = [ hBox $ [cell x y | x <- [0..8]] | y <- [0..8] ]
-        cell x y
-            | (x, y) == (px, py) = withAttr "player" $ str "😀"
-            | (x, y) `elem` walls = withAttr "wall" $ str "[]"
-            | otherwise = withAttr "grass" $ str "  "
+drawTui (TuiState _ (Player (px, py)) walls boxes) = [vBox rows]
+  where
+    rows = [hBox $ [cell x y | x <- [0..8]] | y <- [0..8]]
+    cell x y = withAttr attr $ str symbol
+      where
+        (attr, symbol) = case (x, y) of
+                          _ | (x, y) == (px, py) -> ("player", "😀")
+                          _ | (x, y) `elem` walls -> ("wall", "🗿")
+                          _ | (x, y) `elem` boxes -> ("box", "📦")
+                          _ -> ("grass", "  ")
+
 
 -- Função para manipular eventos de entrada
 handleTuiEvent :: TuiState -> BrickEvent n e -> EventM n (Next TuiState)
 handleTuiEvent s (VtyEvent (EvKey key [])) =
-    case key of
-        KLeft -> continue $ s { player = (player s) { playerPos = move L (playerPos (player s)) (walls s) } }
-        KRight -> continue $ s { player = (player s) { playerPos = move R (playerPos (player s)) (walls s) } }
-        KUp -> continue $ s { player = (player s) { playerPos = move U (playerPos (player s)) (walls s) } }
-        KDown -> continue $ s { player = (player s) { playerPos = move D (playerPos (player s)) (walls s) } }
+    let (newPlayerPos, newBoxes) = move dir (playerPos (player s)) (walls s) (boxes s)
+        dir = case key of
+            KLeft -> L
+            KRight -> R
+            KUp -> U
+            KDown -> D
+            _ -> undefined
+    in case key of
         KChar 'q' -> halt s
-        _ -> continue s
+        _ -> if dir `elem` [L, R, U, D]
+             then continue $ s { player = (player s) { playerPos = newPlayerPos }, boxes = newBoxes }
+             else continue s
 handleTuiEvent s _ = continue s
 
 -- Função para iniciar a TUI
