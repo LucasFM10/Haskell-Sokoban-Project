@@ -1,25 +1,16 @@
-module GameLogic where
+module GameLogic (
+    isLevelWon,
+    movePlayer,
+    findPlayer,
+) where
 
 import System.IO
-
--- Definindo os tipos de tiles no jogo
-data Tile = Wall | Ground | Box | Goal | Player | PlayerOnGoal | BoxOnGoal
-  deriving (Show, Eq)
-
--- Definindo as direções possíveis para o movimento
-data Dir = Up | Down | Left | Right
-  deriving (Show, Eq)
-
--- Definindo o tipo para o tabuleiro, que será uma lista de listas de Tiles
-type Board = [[Tile]]
-
--- Representa uma posição no tabuleiro
-type Position = (Int, Int)
+import Types
 
 nextPosition :: Position -> Dir -> Position
 nextPosition (x, y) dir = case dir of
-    GameLogic.Left  -> (x, y - 1)
-    GameLogic.Right -> (x, y + 1)
+    Types.Left  -> (x, y - 1)
+    Types.Right -> (x, y + 1)
     Up              -> (x - 1, y)
     Down            -> (x + 1, y)
 
@@ -93,58 +84,12 @@ updateBoardWithNewBoxPosition board (boxX, boxY) (newBoxX, newBoxY) =
     in replaceTile (replaceTile board boxX boxY oldBoxTile) newBoxX newBoxY newBoxTile
 
 
-
-
 -- Substitui um tile em uma posição específica
 replaceTile :: Board -> Int -> Int -> Tile -> Board
 replaceTile board x y tile = 
     take x board ++ 
     [take y (board !! x) ++ [tile] ++ drop (y + 1) (board !! x)] ++ 
     drop (x + 1) board
-
--- Função que lê um arquivo de nível e converte para o tipo Board
-readLevel :: FilePath -> IO Board
-readLevel filePath = do
-    contents <- readFile filePath
-    let linesOfTiles = map (map charToTile) . lines $ contents
-    return linesOfTiles
-
--- Função auxiliar para converter um caractere para um Tile
-charToTile :: Char -> Tile
-charToTile '#' = Wall
-charToTile ' ' = Ground
-charToTile 'o' = Box
-charToTile '.' = Goal
-charToTile '@' = Player
-charToTile '+' = PlayerOnGoal
-charToTile '*' = BoxOnGoal
-charToTile _   = error "Invalid tile character"
-
--- Configurações do terminal
-setupTerminal :: IO ()
-setupTerminal = do
-    hSetEcho stdin False
-    hSetBuffering stdin NoBuffering
-    hSetBuffering stdout NoBuffering
-
--- Limpar a tela
-clearScreen :: IO ()
-clearScreen = putStr "\ESC[2J"
-
--- Imprime o tabuleiro na tela
-printBoard :: Board -> IO ()
-printBoard board = do
-    clearScreen
-    mapM_ (putStrLn . map tileToChar) board
-
-tileToChar :: Tile -> Char
-tileToChar Wall = '🧱'
-tileToChar Ground = '⬛'
-tileToChar Box = '🍉'
-tileToChar Goal = '⭐'
-tileToChar Player = '😎'
-tileToChar PlayerOnGoal = '🤩'
-tileToChar BoxOnGoal = '🌟'
 
 isLevelWon :: Board -> Bool
 isLevelWon board = not (any (elem Box) board)
