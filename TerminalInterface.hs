@@ -12,7 +12,7 @@ import Types
 
 -- Limpar a tela
 clearScreen :: IO ()
-clearScreen = putStr "\ESC[2J"
+clearScreen = putStr "\ESC[2J\ESC[H"
 
 -- Configurações do terminal baseadas no estado
 setupTerminal :: Estado -> IO ()
@@ -26,12 +26,13 @@ setupTerminal estado = do
             hSetEcho stdin True
             hSetBuffering stdin LineBuffering
             hSetBuffering stdout LineBuffering
+
 -- Imprime o tabuleiro na tela
 printBoard :: Board -> IO ()
 printBoard board = do
     clearScreen
     mapM_ (putStrLn . map tileToChar) board
-    putStrLn "\nUtilize wasd para mover nosso herói estiloso!\n"
+    putStrLn "\nUtilize WASD para mover, M para menu, Q para sair, R para reiniciar."
 
 -- Função auxiliar para converter um Tile para um caractere
 tileToChar :: Tile -> Char
@@ -42,14 +43,6 @@ tileToChar Goal = '⭐'
 tileToChar Player = '😎'
 tileToChar PlayerOnGoal = '🤩'
 tileToChar BoxOnGoal = '🌟'
-
--- Divide o conteúdo do arquivo em níveis separados por linhas vazias
-splitLevels :: [String] -> [[String]]
-splitLevels lines = filter (not . null) $ foldr splitFunc [[]] lines
-  where
-    splitFunc line (acc:accs)
-        | null line = [] : acc : accs  -- Inicia um novo nível quando encontra uma linha vazia
-        | otherwise = (line : acc) : accs  -- Adiciona a linha ao nível atual
 
 -- Mostra o menu inicial e solicita ao usuário para escolher um nível
 showMenu :: String -> [Board] -> IO ()
@@ -66,21 +59,21 @@ showMenu message boards = do
                 if level >= 1 && level <= length boards then do
                     setupTerminal InGame
                     let selectedBoard = boards !! (level - 1)
-                    gameLoop boards selectedBoard  -- Passa o tabuleiro escolhido e a lista completa de tabuleiros
-                else showMenu ("Nível inválido, por favor digite um número entre 1 e " ++ (show (length boards)) ++ ".\nOu 'quit' para encerrar o programa.") boards
+                    gameLoop boards level selectedBoard
+                else showMenu ("Nível inválido, por favor digite um número entre 1 e " ++ (show (length boards)) ++ ".") boards
             _ -> showMenu "Por favor, insira um número!" boards
 
-
 -- Game loop que processa o jogo para um tabuleiro específico
-gameLoop :: [Board] -> Board -> IO ()
-gameLoop boards currentBoard = do
+gameLoop :: [Board] -> Int -> Board -> IO ()
+gameLoop boards idx currentBoard = do
+    let originalBoard = boards !! (idx - 1)
     printBoard currentBoard
     if isLevelWon currentBoard then do
         putStrLn "Você venceu! Aperte qualquer tecla para retornar ao menu."
         _ <- getChar
         setupTerminal Menu
         clearScreen
-        showMenu ("Bem vindo de volta! Qual nível você deseja enfrentar agora?\nDigite um número entre 1 e " ++ (show (length boards)) ++ ".\nOu 'quit' para encerrar o programa.") boards
+        showMenu "Bem vindo de volta! Qual nível você deseja enfrentar agora?" boards
     else do
         command <- getChar
         let newBoard = case command of
@@ -88,13 +81,14 @@ gameLoop boards currentBoard = do
                 's' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Down
                 'a' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Left
                 'd' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Right
+                'r' -> currentBoard  -- Reinicia o nível atual
                 _   -> currentBoard
-        if command `elem` ['w', 's', 'a', 'd']
-            then gameLoop boards newBoard
-            else case command of
-                'm' -> do
-                    setupTerminal Menu
-                    clearScreen
-                    showMenu ("Bem vindo de volta! Qual nível você deseja enfrentar agora?\ndigitando um número entre 1 e " ++ (show (length boards)) ++ ".\nOu 'quit' para encerrar o programa.") boards
-                'q' -> return ()
-                _   -> gameLoop boards currentBoard
+        case command of
+            'm' -> do
+                setupTerminal Menu
+                clearScreen
+                showMenu "Bem vindo de volta!" boards
+            'q' -> return ()
+            'r' -> gameLoop boards idx originalBoard  -- Reinicia o nível
+            _   -> gameLoop boards idx newBoard
+
