@@ -66,30 +66,37 @@ moveBox board playerPos boxPos newBoxPos dir =
 
 -- Atualiza o tabuleiro movendo o jogador da posição antiga para a nova posição
 updateBoardWithNewPlayerPosition :: Board -> Position -> Position -> Board
-updateBoardWithNewPlayerPosition board (oldX, oldY) (newX, newY) =
-    let oldTile = if board !! oldX !! oldY == PlayerOnGoal then Goal else Ground
-        newTile = case board !! newX !! newY of
+updateBoardWithNewPlayerPosition board oldPos newPos =
+    let oldTile = if (board `at` oldPos) == PlayerOnGoal then Goal else Ground
+        newTile = case (board `at` newPos) of
                     Goal -> PlayerOnGoal
                     _ -> Player
-        updatedBoard = replaceTile board oldX oldY oldTile  -- Primeira atualização
-    in replaceTile updatedBoard newX newY newTile  -- Segunda atualização
+        updatedBoard = replaceTile board oldPos oldTile
+    in replaceTile updatedBoard newPos newTile
 
-
+-- Atualiza o tabuleiro movendo a caixa da posição antiga para a nova posição
 updateBoardWithNewBoxPosition :: Board -> Position -> Position -> Board
-updateBoardWithNewBoxPosition board (boxX, boxY) (newBoxX, newBoxY) =
-    let oldBoxTile = if board !! boxX !! boxY == BoxOnGoal then Goal else Ground
-        newBoxTile = case board !! newBoxX !! newBoxY of
+updateBoardWithNewBoxPosition board oldBoxPos newBoxPos =
+    let oldBoxTile = case (board `at` oldBoxPos) of
+                        BoxOnGoal -> Goal
+                        _    -> Ground
+        newBoxTile = case (board `at` newBoxPos) of
                         Goal -> BoxOnGoal
                         _    -> Box
-    in replaceTile (replaceTile board boxX boxY oldBoxTile) newBoxX newBoxY newBoxTile
+    in replaceTile (replaceTile board oldBoxPos oldBoxTile) newBoxPos newBoxTile
+
+-- Adicionando uma função auxiliar para acessar o Board de forma segura
+at :: Board -> Position -> Tile
+at board (x, y) = (board !! x) !! y
 
 
--- Substitui um tile em uma posição específica
-replaceTile :: Board -> Int -> Int -> Tile -> Board
-replaceTile board x y tile = 
+-- Substitui um tile em uma posição específica usando Position
+replaceTile :: Board -> Position -> Tile -> Board
+replaceTile board (x, y) tile = 
     take x board ++ 
     [take y (board !! x) ++ [tile] ++ drop (y + 1) (board !! x)] ++ 
     drop (x + 1) board
+
 
 isLevelWon :: Board -> Bool
 isLevelWon board = not (any (elem Box) board)

@@ -7,7 +7,7 @@ module TerminalInterface (
 
 import System.IO (hSetEcho, hSetBuffering, BufferMode(..), stdin, stdout)
 import Data.Maybe (fromJust)
-import GameLogic
+import GameLogic(findPlayer, movePlayer, isLevelWon)
 import Types
 
 -- Limpar a tela
