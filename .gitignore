@@ -1,3 +1,6 @@
 # Ignorar arquivos de interface de objeto e de sistema de interface do Haskell
 *.hi
 *.o
+
+# Ignorar os binários/executáveis, caso eles sejam compilados diretamente
+main
