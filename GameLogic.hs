@@ -71,7 +71,9 @@ moveBox board playerPos boxPos newBoxPos dir =
 -- Atualiza o tabuleiro movendo o jogador da posição antiga para a nova posição
 updateBoardWithNewPlayerPosition :: Board -> Position -> Position -> Board
 updateBoardWithNewPlayerPosition board oldPos newPos =
-    let oldTile = if (board `at` oldPos) == PlayerOnGoal then Goal else Ground
+    let oldTile = case (board `at` oldPos) of
+                    PlayerOnGoal -> Goal
+                    _ -> Ground
         newTile = case (board `at` newPos) of
                     Goal -> PlayerOnGoal
                     _ -> Player
