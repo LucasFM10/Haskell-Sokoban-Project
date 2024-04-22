@@ -79,8 +79,8 @@ gameLoop boards idx currentBoard = do
     else do
         command <- getChar
         let newBoard = case command of
-                'w' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Up
-                's' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Down
+                'w' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Up
+                's' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Down
                 'a' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Left
                 'd' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Right
                 _   -> currentBoard
