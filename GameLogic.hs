@@ -1,7 +1,7 @@
 module GameLogic (
     isLevelWon,
     movePlayer,
-    findPlayer,
+    locatePlayer,
 ) where
 
 import System.IO
@@ -16,23 +16,26 @@ nextPosition (x, y) dir = case dir of
 
 
 -- Função para encontrar a posição do jogador no tabuleiro
-findPlayer :: Board -> Maybe Position
-findPlayer board = findPlayerHelper board 0
+locatePlayer :: Board -> Position
+locatePlayer board = locatePlayerInBoard board 0
 
--- Função auxiliar para percorrer o tabuleiro
-findPlayerHelper :: Board -> Int -> Maybe Position
-findPlayerHelper [] _ = Nothing  -- Não há mais linhas para verificar
-findPlayerHelper (row:rows) rowIndex = 
-    case findPlayerInRow row 0 of
-        Just colIndex -> Just (rowIndex, colIndex)  -- Encontrou o jogador na linha atual
-        Nothing -> findPlayerHelper rows (rowIndex + 1)  -- Continua procurando nas próximas linhas
+-- Função auxiliar para percorrer o tabuleiro linha por linha
+locatePlayerInBoard :: Board -> Int -> Position
+locatePlayerInBoard (row:rows) rowIndex =
+    case locatePlayerInRow row 0 of
+        Just colIndex -> (rowIndex, colIndex)  -- Encontrou o jogador na linha atual
+        Nothing -> locatePlayerInBoard rows (rowIndex + 1)  -- Continua procurando nas próximas linhas
 
 -- Função para encontrar o jogador em uma única linha
-findPlayerInRow :: [Tile] -> Int -> Maybe Int
-findPlayerInRow [] _ = Nothing  -- Chegou ao fim da linha sem encontrar o jogador
-findPlayerInRow (tile:rest) colIndex
-    | tile == Player || tile == PlayerOnGoal = Just colIndex  -- Encontrou o jogador
-    | otherwise = findPlayerInRow rest (colIndex + 1)  -- Continua na mesma linha
+locatePlayerInRow :: [Tile] -> Int -> Maybe Int
+locatePlayerInRow [] _ = Nothing  -- Chegou ao fim da linha sem encontrar o jogador
+locatePlayerInRow (tile:rest) colIndex
+    | isPlayer tile = Just colIndex  -- Encontrou o jogador
+    | otherwise = locatePlayerInRow rest (colIndex + 1)  -- Continua na mesma linha
+
+-- Função auxiliar para verificar se o Tile é um jogador ou jogador em um objetivo
+isPlayer :: Tile -> Bool
+isPlayer tile = tile == Player || tile == PlayerOnGoal
 
 
 -- Função para mover o jogador em uma direção, assumindo que já conhecemos a sua posição

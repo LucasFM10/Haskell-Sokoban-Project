@@ -7,7 +7,7 @@ module TerminalInterface (
 
 import System.IO (hSetEcho, hSetBuffering, BufferMode(..), stdin, stdout)
 import Data.Maybe (fromJust)
-import GameLogic(findPlayer, movePlayer, isLevelWon)
+import GameLogic
 import Types
 import Text.Read (readMaybe)
 
@@ -79,10 +79,10 @@ gameLoop boards idx currentBoard = do
     else do
         command <- getChar
         let newBoard = case command of
-                'w' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Up
-                's' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Down
-                'a' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Left
-                'd' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Right
+                'w' -> movePlayer currentBoard (locatePlayer currentBoard) Types.Up
+                's' -> movePlayer currentBoard (locatePlayer currentBoard) Types.Down
+                'a' -> movePlayer currentBoard (locatePlayer currentBoard) Types.Left
+                'd' -> movePlayer currentBoard (locatePlayer currentBoard) Types.Right
                 _   -> currentBoard
         case command of
             'm' -> do
