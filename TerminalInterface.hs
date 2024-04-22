@@ -83,7 +83,6 @@ gameLoop boards idx currentBoard = do
                 's' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Down
                 'a' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Left
                 'd' -> movePlayer currentBoard (fromJust $ findPlayer currentBoard) Types.Right
-                'r' -> currentBoard  -- Reinicia o nível atual
                 _   -> currentBoard
         case command of
             'm' -> do
