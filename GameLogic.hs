@@ -95,13 +95,25 @@ updateBoardWithNewBoxPosition board oldBoxPos newBoxPos =
 at :: Board -> Position -> Tile
 at board (x, y) = (board !! x) !! y
 
-
--- Substitui um tile em uma posição específica usando Position
+-- Substitui um tile em uma posição específica do tabuleiro.
 replaceTile :: Board -> Position -> Tile -> Board
-replaceTile board (x, y) tile = 
-    take x board ++ 
-    [take y (board !! x) ++ [tile] ++ drop (y + 1) (board !! x)] ++ 
-    drop (x + 1) board
+replaceTile board (rowIndex, colIndex) newTile =
+    -- Primeiro, pegamos todas as linhas antes da linha que queremos modificar
+    let beforeRow = take rowIndex board
+        -- Esta é a linha atual que vamos modificar
+        currentRow = board !! rowIndex
+        -- Agora, criamos a nova linha modificada:
+        -- 1. Pegamos os tiles antes da posição desejada
+        newRowBefore = take colIndex currentRow
+        -- 2. Criamos a parte depois do tile que estamos substituindo
+        newRowAfter = drop (colIndex + 1) currentRow
+        -- 3. Combinamos o antes, o novo tile, e o depois para formar a nova linha
+        newRow = newRowBefore ++ [newTile] ++ newRowAfter
+        -- Por fim, pegamos todas as linhas depois da linha que modificamos
+        afterRow = drop (rowIndex + 1) board
+    -- Combinamos as partes para formar o novo tabuleiro
+    in beforeRow ++ [newRow] ++ afterRow
+
 
 
 isLevelWon :: Board -> Bool
