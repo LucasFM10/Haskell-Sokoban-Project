@@ -42,12 +42,13 @@ isPlayer tile = tile == Player || tile == PlayerOnGoal
 movePlayer :: Board -> Position -> Dir -> Board
 movePlayer board pos dir =
     let newPos = nextPosition pos dir
-        nextBoxPos = nextPosition newPos dir  -- Calcula a posição após a caixa
+        nextBoxPos = nextPosition newPos dir  -- Calcula a nova posição em que a caixa vai ficar (caso uma caixa seja empurrada)
     in case board !! fst newPos !! snd newPos of
         Wall -> board  -- Se a nova posição é uma parede, não move
-        Box -> moveBoxIfPossible board pos newPos nextBoxPos  -- Trata movimento de Box
-        BoxOnGoal -> moveBoxIfPossible board pos newPos nextBoxPos  -- Trata movimento de BoxOnGoal
-        _ -> updateBoardWithNewPlayerPosition board pos newPos  -- Para outras situações, move o jogador normalmente
+        Box -> moveBoxIfPossible board pos newPos nextBoxPos
+        BoxOnGoal -> moveBoxIfPossible board pos newPos nextBoxPos  -- Trata os possíveis movimentos da caixa
+        Ground -> updateBoardWithNewPlayerPosition board pos newPos
+        Goal -> updateBoardWithNewPlayerPosition board pos newPos -- Trata os possíveis movimentos caso o player não encontre obstruções
 
 isFreeSpace :: Board -> Position -> Bool
 isFreeSpace board (x, y) =
