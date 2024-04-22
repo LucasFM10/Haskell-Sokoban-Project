@@ -11,8 +11,8 @@ nextPosition :: Position -> Dir -> Position
 nextPosition (x, y) dir = case dir of
     Types.Left  -> (x, y - 1)
     Types.Right -> (x, y + 1)
-    Types.Up              -> (x - 1, y)
-    Types.Down            -> (x + 1, y)
+    Types.Up    -> (x - 1, y)
+    Types.Down  -> (x + 1, y)
 
 
 -- Função para encontrar a posição do jogador no tabuleiro
