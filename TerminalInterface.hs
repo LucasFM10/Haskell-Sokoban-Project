@@ -9,6 +9,7 @@ import System.IO (hSetEcho, hSetBuffering, BufferMode(..), stdin, stdout)
 import Data.Maybe (fromJust)
 import GameLogic(findPlayer, movePlayer, isLevelWon)
 import Types
+import Text.Read (readMaybe)
 
 -- Limpar a tela
 clearScreen :: IO ()
@@ -53,15 +54,16 @@ showMenu message boards = do
         putStrLn "Encerrando o jogo. Até mais!"
         return ()  -- Encerra o programa
     else
-        let parsedInput = reads input :: [(Int, String)]
-        in case parsedInput of
-            [(level, "")] ->
+        case readMaybe input :: Maybe Int of
+            Just level ->
                 if level >= 1 && level <= length boards then do
                     setupTerminal InGame
                     let selectedBoard = boards !! (level - 1)
                     gameLoop boards level selectedBoard
-                else showMenu ("Nível inválido, por favor digite um número entre 1 e " ++ (show (length boards)) ++ ".") boards
-            _ -> showMenu "Por favor, insira um número!" boards
+                else
+                    showMenu ("Nível inválido, por favor digite um número entre 1 e " ++ show (length boards) ++ ".") boards
+            Nothing ->
+                showMenu "Por favor, insira um número!" boards
 
 -- Game loop que processa o jogo para um tabuleiro específico
 gameLoop :: [Board] -> Int -> Board -> IO ()
