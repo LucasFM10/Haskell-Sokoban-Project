@@ -24,11 +24,12 @@ readLevels filePath = do
 
 -- Divide o conteúdo do arquivo em níveis separados por linhas vazias
 splitLevels :: [String] -> [[String]]
-splitLevels lines = filter (not . null) $ foldr splitFunc [[]] lines
+splitLevels allLines = filter (not . null) (foldr addToLevel [[]] allLines)
   where
-    splitFunc line (acc:accs)
-        | null line = [] : acc : accs
-        | otherwise = (line : acc) : accs
+    addToLevel currentLine (currentLevel:restOfLevels)
+        | null currentLine = [] : currentLevel : restOfLevels  -- Começa um novo nível se a linha atual é vazia
+        | otherwise = (currentLine : currentLevel) : restOfLevels  -- Adiciona a linha atual ao nível atual
+
 
 -- Converte um bloco de texto em um Board
 parseLevel :: [String] -> Board
