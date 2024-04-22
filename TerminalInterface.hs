@@ -6,7 +6,6 @@ module TerminalInterface (
 ) where
 
 import System.IO (hSetEcho, hSetBuffering, BufferMode(..), stdin, stdout)
-import Data.Maybe (fromJust)
 import GameLogic
 import Types
 import Text.Read (readMaybe)
