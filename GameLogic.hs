@@ -61,12 +61,7 @@ moveBoxIfPossible board playerPos boxPos newBoxPos =
     then
         let boardAfterBoxMove = updateBoardWithNewBoxPosition board boxPos newBoxPos
         in updateBoardWithNewPlayerPosition boardAfterBoxMove playerPos boxPos
-    else board  -- Se não estiver livre, não faz nada
-
-moveBox :: Board -> Position -> Position -> Position -> Dir -> Board
-moveBox board playerPos boxPos newBoxPos dir =
-    let boardAfterBoxMove = updateBoardWithNewBoxPosition board boxPos newBoxPos
-    in updateBoardWithNewPlayerPosition boardAfterBoxMove playerPos boxPos
+    else board  -- Se a caixa estiver obstruída, o player não se move
 
 -- Atualiza o tabuleiro movendo o jogador da posição antiga para a nova posição
 updateBoardWithNewPlayerPosition :: Board -> Position -> Position -> Board
