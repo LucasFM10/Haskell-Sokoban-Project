@@ -71,25 +71,19 @@ moveBox board playerPos boxPos newBoxPos dir =
 -- Atualiza o tabuleiro movendo o jogador da posição antiga para a nova posição
 updateBoardWithNewPlayerPosition :: Board -> Position -> Position -> Board
 updateBoardWithNewPlayerPosition board currentPos newPos =
-    let currentTile = case (board `at` currentPos) of
-                    PlayerOnGoal -> Goal
-                    _ -> Ground
-        newTile = case (board `at` newPos) of
-                    Goal -> PlayerOnGoal
-                    _ -> Player
-        updatedBoard = replaceTile board currentPos currentTile
-    in replaceTile updatedBoard newPos newTile
+    replaceTile (replaceTile board currentPos currentTile) newPos newTile
+    where
+        currentTile = if board `at` currentPos == PlayerOnGoal then Goal else Ground
+        newTile = if board `at` newPos == Goal then PlayerOnGoal else Player
+
 
 -- Atualiza o tabuleiro movendo a caixa da posição antiga para a nova posição
 updateBoardWithNewBoxPosition :: Board -> Position -> Position -> Board
 updateBoardWithNewBoxPosition board currentBoxPos newBoxPos =
-    let currentBoxTile = case (board `at` currentBoxPos) of
-                        BoxOnGoal -> Goal
-                        _    -> Ground
-        newBoxTile = case (board `at` newBoxPos) of
-                        Goal -> BoxOnGoal
-                        _    -> Box
-    in replaceTile (replaceTile board currentBoxPos currentBoxTile) newBoxPos newBoxTile
+    replaceTile board newBoxPos newBoxTile
+    where
+        newBoxTile = if board `at` newBoxPos == Goal then BoxOnGoal else Box
+
 
 -- Adicionando uma função auxiliar para acessar o Board de forma segura
 at :: Board -> Position -> Tile
