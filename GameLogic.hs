@@ -69,8 +69,7 @@ updateBoardWithNewPlayerPosition board currentPos newPos =
     replaceTile (replaceTile board currentPos currentTile) newPos newTile
     where
         currentTile = if board `at` currentPos == PlayerOnGoal then Goal else Ground
-        newTile = if board `at` newPos == Goal then PlayerOnGoal else Player
-
+        newTile = if (board `at` newPos == Goal || board `at` newPos == BoxOnGoal) then PlayerOnGoal else Player
 
 -- Atualiza o tabuleiro movendo a caixa da posição antiga para a nova posição
 updateBoardWithNewBoxPosition :: Board -> Position -> Position -> Board
