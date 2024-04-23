@@ -1,3 +1,7 @@
+-- Trabalho dos alunos:
+-- LUCAS FARIAS DE MEDEIROS 20220054884
+-- JOAO VICTOR MENDONCA DE CARVALHO 20200096706 
+
 import TerminalInterface (showMenu, setupTerminal)
 import Types(Estado(..))
 import LoadLevels(readLevels)
